@@ -2,3 +2,5 @@
 exp/
 .project
 .cproject
+*.o
+sudoku
