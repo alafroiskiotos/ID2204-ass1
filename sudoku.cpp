@@ -12,11 +12,12 @@ using namespace Gecode;
 class Sudoku : public Script {
 protected:
 	IntVarArray cells;
+private:
+	int raw[N * N];
+	int counter;
 public:
 	Sudoku(const Options& opt) : Script(opt), cells(*this, N * N, 1, N) {
-		int raw[N * N];
-		int counter = 0;
-
+		counter = 0;
 		// Flatten input matrix
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
@@ -42,14 +43,14 @@ public:
 
 		// Distinct row
 		for (int i = 0; i < N; i++)
-			distinct(*this, matrix.row(i));
+			distinct(*this, matrix.row(i), opt.icl());
 		// Distinct column
 		for (int i = 0; i < N; i++)
-			distinct(*this, matrix.col(i));
+			distinct(*this, matrix.col(i), opt.icl());
 		// Distinct 3x3 block
 		for (int i = 0; i < N; i += 3)
 			for (int j = 0; j < N; j += 3)
-				distinct(*this, matrix.slice(i, i + 3, j, j + 3));
+				distinct(*this, matrix.slice(i, i + 3, j, j + 3), opt.icl());
 
 		// Branching
 		branch(*this, cells, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
