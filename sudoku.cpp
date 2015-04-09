@@ -54,7 +54,20 @@ public:
 
 	// Print solution, Command Prompt
 	void print(void) {
-		std::cout << cells << std::endl;
+		std::cout << "=================================" << std::endl;
+		for (int i = 1; i <= N*N; i++) {
+			std::cout << " " << cells[i-1] << " ";
+			if ((i % 3) == 0 && i != 0)
+				std::cout << "||";
+			if (((i % N) == 0) && (i != 0)) {
+				std::cout << std::endl;
+				if ((i % 27) == 0 && i != 0) {
+					std::cout << "=================================" << std::endl;
+				}
+			}
+		}
+		std::cout << std::endl;
+		//std::cout << cells << std::endl;
 	}
 };
 
