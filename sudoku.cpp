@@ -1,6 +1,7 @@
 #include <gecode/int.hh>
 #include <gecode/minimodel.hh>
 #include <gecode/search.hh>
+#include <gecode/driver.hh>
 
 #include "A1.cpp"
 
@@ -8,11 +9,23 @@
 
 using namespace Gecode;
 
-class Sudoku : public Space {
+class Sudoku : public Script {
 protected:
 	IntVarArray cells;
 public:
-	Sudoku(int raw[N * N]) : cells(*this, N * N, 1, N) {
+	Sudoku(const Options& opt) : Script(opt), cells(*this, N * N, 1, N) {
+		int raw[N * N];
+		int counter = 0;
+
+		// Flatten input matrix
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				int index = counter + j;
+				raw[index] = examples[0][i][j];
+			}
+			counter += N;
+		}
+
 		// Initialize cells
 		Matrix<IntVarArray> matrix(cells, N, N);
 
@@ -43,7 +56,7 @@ public:
 	}
 
 	// Constructor for cloning
-	Sudoku(bool share, Sudoku& s) : Space(share, s) {
+	Sudoku(bool share, Sudoku& s) : Script(share, s) {
 		cells.update(*this, share, s.cells);
 	}
 
@@ -53,26 +66,26 @@ public:
 	}
 
 	// Print solution, Command Prompt
-	void print(void) {
-		std::cout << "=================================" << std::endl;
+	virtual void print(std::ostream& os) const {
+		os << "=================================" << std::endl;
 		for (int i = 1; i <= N*N; i++) {
-			std::cout << " " << cells[i-1] << " ";
+			os << " " << cells[i-1] << " ";
 			if ((i % 3) == 0 && i != 0)
-				std::cout << "||";
+				os << "||";
 			if (((i % N) == 0) && (i != 0)) {
-				std::cout << std::endl;
+				os << std::endl;
 				if ((i % 27) == 0 && i != 0) {
-					std::cout << "=================================" << std::endl;
+					os << "=================================" << std::endl;
 				}
 			}
 		}
-		std::cout << std::endl;
+		os << std::endl;
 		//std::cout << cells << std::endl;
 	}
 };
 
 int main(int argc, char* argv[]) {
-	int raw[N * N];
+	/*int raw[N * N];
 	int counter = 0;
 
 	for (int i = 0; i < N; i++) {
@@ -81,18 +94,15 @@ int main(int argc, char* argv[]) {
 			raw[index] = examples[0][i][j];
 		}
 		counter += N;
-	}
-	// Create model
-	Sudoku* sudoku = new Sudoku(raw);
+	}*/
 
-	// Create search engine
-	DFS<Sudoku> e(sudoku);
-	delete(sudoku);
-
-	while (Sudoku* solution = e.next()) {
-		solution -> print();
-		delete(solution);
-	}
+	Options opt("Sudoku");
+	opt.icl(ICL_DEF);
+	opt.icl(ICL_DOM);
+	opt.icl(ICL_VAL);
+	opt.icl(ICL_BND);
+	opt.parse(argc, argv);
+	Script::run<Sudoku, BAB, Options>(opt);
 
 	return 0;
 }
