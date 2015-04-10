@@ -9,20 +9,38 @@
 
 using namespace Gecode;
 
+class PuzzleOptions : public Options {
+private:
+	Driver::UnsignedIntOption _puzzle;
+public:
+	PuzzleOptions(const char* e) : Options(e), _puzzle("-puzzle", "Example puzzle number [0-17]", 0) {
+		add(_puzzle);
+	}
+	unsigned int puzzle(void) const {
+		return _puzzle.value();
+	}
+
+	void parse(int& argc, char* argv[]) {
+		Options::parse(argc, argv);
+	}
+};
+
 class Sudoku : public Script {
 protected:
 	IntVarArray cells;
 private:
 	int raw[N * N];
 	int counter;
+	int puzzle;
 public:
-	Sudoku(const Options& opt) : Script(opt), cells(*this, N * N, 1, N) {
+	Sudoku(const PuzzleOptions& opt) : Script(opt), cells(*this, N * N, 1, N), puzzle(opt.puzzle()) {
+		std::cout << "Example: " << puzzle << std::endl;
 		counter = 0;
 		// Flatten input matrix
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
 				int index = counter + j;
-				raw[index] = examples[0][i][j];
+				raw[index] = examples[puzzle][i][j];
 			}
 			counter += N;
 		}
@@ -36,7 +54,6 @@ public:
 			if (raw[i] != 0) {
 				int row = i / N;
 				int column = i % N;
-				//std::cout << "Row: " << row << " Col: " << column << " Val: " << raw[i] << std::endl;
 				rel(*this, matrix(column, row), IRT_EQ, raw[i]);
 			}
 		}
@@ -86,24 +103,14 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-	/*int raw[N * N];
-	int counter = 0;
+	PuzzleOptions opt("Sudoku");
 
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			int index = counter + j;
-			raw[index] = examples[0][i][j];
-		}
-		counter += N;
-	}*/
-
-	Options opt("Sudoku");
 	opt.icl(ICL_DEF);
 	opt.icl(ICL_DOM);
 	opt.icl(ICL_VAL);
 	opt.icl(ICL_BND);
 	opt.parse(argc, argv);
-	Script::run<Sudoku, BAB, Options>(opt);
+	Script::run<Sudoku, BAB, PuzzleOptions>(opt);
 
 	return 0;
 }
