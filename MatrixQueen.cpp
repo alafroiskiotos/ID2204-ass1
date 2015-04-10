@@ -123,6 +123,7 @@ public:
 int main(int argc, char* argv[]) {
         SizeOptions opt("MatrixQueens");
         opt.size(4);
-        Script::run<MatrixQueen,DFS,SizeOptions>(opt);
+        opt.parse(argc, argv);
+        Script::run<MatrixQueen,BAB,SizeOptions>(opt);
     return 0;
 }

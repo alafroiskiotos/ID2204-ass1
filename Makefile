@@ -4,10 +4,10 @@ LIBS=-lgecodeflatzinc -lgecodedriver -lgecodegist -lgecodesearch -lgecodeminimod
 	-lgecodeset -lgecodefloat -lgecodeint -lgecodekernel -lgecodesupport
 RM=rm
 SRCS0=sudoku.cpp A1.cpp
-#SRCS1=donald.cpp
+SRCS1=MatrixQueen.cpp
 OBJS0=$(subst .cpp,.o,$(SRCS0))
-#OBJS1=$(subst .cpp,.o,$(SRCS1))
-EXEC=sudoku
+OBJS1=$(subst .cpp,.o,$(SRCS1))
+EXEC=sudoku matrix_queen
 
 all: $(EXEC)
 
@@ -16,13 +16,13 @@ sudoku: $(OBJS0)
 
 money.o: money.cpp
 
-#donald: $(OBJS1)
-#	$(CXX) $(CXXFLAGS) -o donald $(OBJS1) $(LIBS)
+matrix_queen: $(OBJS1)
+	$(CXX) $(CXXFLAGS) -o matrix_queen $(OBJS1) $(LIBS)
 
-#donald.o: donald.cpp
+donald.o: MatrixQueen.cpp
 
 clean:
-	$(RM) $(OBJS0)
+	$(RM) $(OBJS0) $(OBJS1)
 
 dist-clean: clean
 	$(RM) $(EXEC)

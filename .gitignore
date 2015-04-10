@@ -4,3 +4,4 @@ exp/
 .cproject
 *.o
 sudoku
+matrix_queen
