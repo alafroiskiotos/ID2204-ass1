@@ -14,12 +14,12 @@ all: $(EXEC)
 sudoku: $(OBJS0)
 	$(CXX) $(CXXFLAGS) -o sudoku $(OBJS0) $(LIBS)
 
-money.o: money.cpp
+sudoku.o: sudoku.cpp
 
 matrix_queen: $(OBJS1)
 	$(CXX) $(CXXFLAGS) -o matrix_queen $(OBJS1) $(LIBS)
 
-donald.o: MatrixQueen.cpp
+MatrixQueen.o: MatrixQueen.cpp
 
 clean:
 	$(RM) $(OBJS0) $(OBJS1)
