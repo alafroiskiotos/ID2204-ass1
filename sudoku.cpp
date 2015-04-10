@@ -1,6 +1,7 @@
 #include <gecode/int.hh>
 #include <gecode/minimodel.hh>
 #include <gecode/search.hh>
+#include <gecode/driver.hh>
 
 #include "A1.cpp"
 
@@ -8,11 +9,42 @@
 
 using namespace Gecode;
 
-class Sudoku : public Space {
+class PuzzleOptions : public Options {
+private:
+	Driver::UnsignedIntOption _puzzle;
+public:
+	PuzzleOptions(const char* e) : Options(e), _puzzle("-puzzle", "Example puzzle number [0-17]", 0) {
+		add(_puzzle);
+	}
+	unsigned int puzzle(void) const {
+		return _puzzle.value();
+	}
+
+	void parse(int& argc, char* argv[]) {
+		Options::parse(argc, argv);
+	}
+};
+
+class Sudoku : public Script {
 protected:
 	IntVarArray cells;
+private:
+	int raw[N * N];
+	int counter;
+	int puzzle;
 public:
-	Sudoku(int raw[N * N]) : cells(*this, N * N, 1, N) {
+	Sudoku(const PuzzleOptions& opt) : Script(opt), cells(*this, N * N, 1, N), puzzle(opt.puzzle()) {
+		std::cout << "Example: " << puzzle << std::endl;
+		counter = 0;
+		// Flatten input matrix
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				int index = counter + j;
+				raw[index] = examples[puzzle][i][j];
+			}
+			counter += N;
+		}
+
 		// Initialize cells
 		Matrix<IntVarArray> matrix(cells, N, N);
 
@@ -22,28 +54,27 @@ public:
 			if (raw[i] != 0) {
 				int row = i / N;
 				int column = i % N;
-				//std::cout << "Row: " << row << " Col: " << column << " Val: " << raw[i] << std::endl;
 				rel(*this, matrix(column, row), IRT_EQ, raw[i]);
 			}
 		}
 
 		// Distinct row
 		for (int i = 0; i < N; i++)
-			distinct(*this, matrix.row(i));
+			distinct(*this, matrix.row(i), opt.icl());
 		// Distinct column
 		for (int i = 0; i < N; i++)
-			distinct(*this, matrix.col(i));
+			distinct(*this, matrix.col(i), opt.icl());
 		// Distinct 3x3 block
 		for (int i = 0; i < N; i += 3)
 			for (int j = 0; j < N; j += 3)
-				distinct(*this, matrix.slice(i, i + 3, j, j + 3));
+				distinct(*this, matrix.slice(i, i + 3, j, j + 3), opt.icl());
 
 		// Branching
 		branch(*this, cells, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
 	}
 
 	// Constructor for cloning
-	Sudoku(bool share, Sudoku& s) : Space(share, s) {
+	Sudoku(bool share, Sudoku& s) : Script(share, s) {
 		cells.update(*this, share, s.cells);
 	}
 
@@ -53,46 +84,33 @@ public:
 	}
 
 	// Print solution, Command Prompt
-	void print(void) {
-		std::cout << "=================================" << std::endl;
+	virtual void print(std::ostream& os) const {
+		os << "=================================" << std::endl;
 		for (int i = 1; i <= N*N; i++) {
-			std::cout << " " << cells[i-1] << " ";
+			os << " " << cells[i-1] << " ";
 			if ((i % 3) == 0 && i != 0)
-				std::cout << "||";
+				os << "||";
 			if (((i % N) == 0) && (i != 0)) {
-				std::cout << std::endl;
+				os << std::endl;
 				if ((i % 27) == 0 && i != 0) {
-					std::cout << "=================================" << std::endl;
+					os << "=================================" << std::endl;
 				}
 			}
 		}
-		std::cout << std::endl;
+		os << std::endl;
 		//std::cout << cells << std::endl;
 	}
 };
 
 int main(int argc, char* argv[]) {
-	int raw[N * N];
-	int counter = 0;
+	PuzzleOptions opt("Sudoku");
 
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			int index = counter + j;
-			raw[index] = examples[0][i][j];
-		}
-		counter += N;
-	}
-	// Create model
-	Sudoku* sudoku = new Sudoku(raw);
-
-	// Create search engine
-	DFS<Sudoku> e(sudoku);
-	delete(sudoku);
-
-	while (Sudoku* solution = e.next()) {
-		solution -> print();
-		delete(solution);
-	}
+	opt.icl(ICL_DEF);
+	opt.icl(ICL_DOM);
+	opt.icl(ICL_VAL);
+	opt.icl(ICL_BND);
+	opt.parse(argc, argv);
+	Script::run<Sudoku, BAB, PuzzleOptions>(opt);
 
 	return 0;
 }
