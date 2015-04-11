@@ -70,7 +70,7 @@ public:
 				distinct(*this, matrix.slice(i, i + 3, j, j + 3), opt.icl());
 
 		// Branching
-		branch(*this, cells, INT_VAR_SIZE_MIN(), INT_VAL_MIN());
+		branch(*this, cells, INT_VAR_MIN_MAX(), INT_VAL_MED());
 	}
 
 	// Constructor for cloning
@@ -98,17 +98,12 @@ public:
 			}
 		}
 		os << std::endl;
-		//std::cout << cells << std::endl;
 	}
 };
 
 int main(int argc, char* argv[]) {
 	PuzzleOptions opt("Sudoku");
 
-	opt.icl(ICL_DEF);
-	opt.icl(ICL_DOM);
-	opt.icl(ICL_VAL);
-	opt.icl(ICL_BND);
 	opt.parse(argc, argv);
 	Script::run<Sudoku, BAB, PuzzleOptions>(opt);
 
