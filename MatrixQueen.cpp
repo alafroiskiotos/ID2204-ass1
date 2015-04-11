@@ -108,8 +108,7 @@ public:
         return new MatrixQueen(share,*this,n);
     }
     
-    virtual void
-    print(std::ostream& os) const {
+    virtual void print(std::ostream& os) const {
         for(int i = 1; i <= n * n; i++) {
             std::cout << chessBoardLin[i-1] << " ";
             
@@ -117,6 +116,8 @@ public:
                 std::cout << std::endl;
             }
         }
+
+        std::cout << std::endl;
     }
 };
 
