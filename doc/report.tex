@@ -1,0 +1,59 @@
+\documentclass[a4paper, 11pt]{article}
+
+\newcommand{\tab}[1]{\hspace{.2\textwidth}\rlap{#1}}
+
+\begin{document}
+
+\title{Assignment 1\\ID2204 -- Constraint Programming}
+
+\author{Antonios Kouzoupis $<$890121-8837$>$ -- Lorenzo Corneo $<$890225-1290$>$\\\{antkou,corneo\}$@$kth.se}
+
+\maketitle
+
+\section{Sudoku}
+
+For the Sudoku puzzle, initially we had to add a custom option
+handler. We did this to parameterize which puzzle from the examples
+would solve. The Script takes the command line options as argument and
+parses the puzzle to solve and the Integer Consistency Level. It
+also initializes a \emph{IntVarArray} matrix with size 81 (9 * 9) and
+values from 1 to 9.
+
+After that, it creates an integer array by flattening the sudoku
+example matrix. The Sudoku grid is represented by the
+\emph{IntVarArray}, created before, and transformed into a Matrix
+object. The constraints we put are integer equality for every element
+in the sudoku example that is different from zero. Also, the numbers
+in each row, column and every 3x3 sub-matrix should be distinct.
+
+For branching there was no strategy that outperformed an other one. We
+experimented with different parameters and we concluded that in most
+of the examples the strategy that performed better is
+INT\_VAR\_MIN\_MAX for variable selection and INT\_VAL\_MED for value
+selection.
+
+Similarly, there is no best option for the Consistency Level. The
+Domain propagation performed better than other levels in most of the
+given sudoku puzzles. But for instance, the Domain propagation for example
+4 results in 4 node traversed and 1 failures whereas the Default level
+results in 23 nodes traversed and 10 failures. The Bounds
+propagation performs better than the default one and the Domain
+propagation by achieving 2 nodes
+traversed and 0 failures. On puzzle number 17 all Consistency levels
+traverse the same number of nodes and perform the same number of
+failures.
+
+\section{n-Queens}
+
+\section{Compile and Run}
+
+To compile the two programs type \texttt{make} in the main
+directory. To delete the object files type \texttt{make clean} and to
+delete both executable and object type \texttt{make dist-clean}.
+	
+In order to run the sudoku program, type \texttt{./sudoku [-puzzle
+  NUM]} where NUM is the number of the sudoku puzzle in the given
+examples file. Default puzzle is the first one. Also it supports every
+option of the Options class.
+
+\end{document}

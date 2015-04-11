@@ -5,3 +5,6 @@ exp/
 *.o
 sudoku
 matrix_queen
+*.aux
+*.log
+*.out

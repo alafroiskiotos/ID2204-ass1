@@ -9,6 +9,7 @@
 
 using namespace Gecode;
 
+// Custom options handler
 class PuzzleOptions : public Options {
 private:
 	Driver::UnsignedIntOption _puzzle;
@@ -52,9 +53,10 @@ public:
 		// Fixed numbers
 		for (int i = 0; i < N * N ; i++) {
 			if (raw[i] != 0) {
+				// Find corresponding row and column
 				int row = i / N;
 				int column = i % N;
-				rel(*this, matrix(column, row), IRT_EQ, raw[i]);
+				rel(*this, matrix(column, row), IRT_EQ, raw[i], opt.icl());
 			}
 		}
 
